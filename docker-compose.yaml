@@ -1,0 +1,53 @@
+version: '3.8'
+services:
+  postgres_students:
+    container_name: postgres_db_students
+    image: postgres:14.3
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db_students
+    ports:
+      - "5432:5432"
+    volumes:
+      - volume_postgres_db_students:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 2s
+      timeout: 20s
+      retries: 10
+
+  postgres_schools:
+    container_name: postgres_db_schools
+    image: postgres:14.3
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db_schools
+    ports:
+      - "5433:5433"
+    expose:
+      - "5433"
+    command:
+      - -p 5433
+    volumes:
+      - volume_postgres_db_schools:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 2s
+      timeout: 20s
+      retries: 10
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin:2.24
+    ports:
+      - "9411:9411"
+volumes:
+  volume_postgres_db_students:
+    external: false
+  volume_postgres_db_schools:
+    external: false
+networks:
+  microservices-net:
